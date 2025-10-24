@@ -1,15 +1,15 @@
 package com.example.foodstore.mapper;
 
-import com.example.foodstore.dto.PedidoCreate;
-import com.example.foodstore.dto.PedidoDto;
-import com.example.foodstore.dto.PedidoEdit;
+import com.example.foodstore.dto.request.PedidoRegister;
+import com.example.foodstore.dto.request.PedidoEdit;
+import com.example.foodstore.dto.response.PedidoResponseDTO;
 import com.example.foodstore.entity.Pedido;
 import com.example.foodstore.entity.Estado;
 
 public class PedidoMapper {
 
-    public static PedidoDto toDTO(Pedido pedido) {
-        return PedidoDto.builder()
+    public static PedidoResponseDTO toDTO(Pedido pedido) {
+        return PedidoResponseDTO.builder()
                 .id(pedido.getId())
                 .fecha(pedido.getFecha())
                 .estado(pedido.getEstado().name())
@@ -18,7 +18,7 @@ public class PedidoMapper {
                 .build();
     }
 
-    public static Pedido toEntity(PedidoCreate pedidoCreate) {
+    public static Pedido toEntity(PedidoRegister pedidoCreate) {
         return Pedido.builder()
                 .fecha(pedidoCreate.getFecha())
                 .estado(Estado.valueOf(pedidoCreate.getEstado()))

@@ -1,15 +1,18 @@
 package com.example.foodstore.service;
 
-import com.example.foodstore.dto.UsuarioCreate;
-import com.example.foodstore.dto.UsuarioDto;
-import com.example.foodstore.dto.UsuarioEdit;
+import com.example.foodstore.dto.request.UsuarioRegister;
+import com.example.foodstore.dto.request.UsuarioEdit;
+import com.example.foodstore.dto.request.UsuarioLoginDTO;
+import com.example.foodstore.dto.response.UsuarioResponseDTO;
+
 import java.util.List;
 
 public interface UsuarioService {
-    UsuarioDto crear(UsuarioCreate usuarioCreate);
-    UsuarioDto actualizar(Long id, UsuarioEdit usuarioEdit);
-    UsuarioDto buscarId(Long id);
-    List<UsuarioDto> buscaTodos();
+    UsuarioResponseDTO registrar(UsuarioRegister usuarioRegister);
+    UsuarioResponseDTO login(UsuarioLoginDTO loginDTO);
+    UsuarioResponseDTO buscarPorId(Long id);
+    UsuarioResponseDTO buscarPorEmail(String email);
+    List<UsuarioResponseDTO> buscarTodos();
+    UsuarioResponseDTO actualizar(Long id, UsuarioEdit usuarioEdit);
     void eliminar(Long id);
-    UsuarioDto buscarPorEmail(String email);
 }

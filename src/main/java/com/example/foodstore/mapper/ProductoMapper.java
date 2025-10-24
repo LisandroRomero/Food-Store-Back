@@ -1,21 +1,21 @@
 package com.example.foodstore.mapper;
 
-import com.example.foodstore.dto.ProductoCreate;
-import com.example.foodstore.dto.ProductoDto;
-import com.example.foodstore.dto.ProductoEdit;
+import com.example.foodstore.dto.request.ProductoRegister;
+import com.example.foodstore.dto.request.ProductoEdit;
+import com.example.foodstore.dto.response.ProductoResponseDTO;
 import com.example.foodstore.entity.Producto;
 
 public class ProductoMapper {
 
-    public static ProductoDto toDTO(Producto producto) {
-        return ProductoDto.builder()
+    public static ProductoResponseDTO toDTO(Producto producto) {
+        return ProductoResponseDTO.builder()
                 .id(producto.getId())
                 .nombre(producto.getNombre())
                 .precio(producto.getPrecio())
                 .build();
     }
 
-    public static Producto toEntity(ProductoCreate productoCreate) {
+    public static Producto toEntity(ProductoRegister productoCreate) {
         return Producto.builder()
                 .nombre(productoCreate.getNombre())
                 .precio(productoCreate.getPrecio())

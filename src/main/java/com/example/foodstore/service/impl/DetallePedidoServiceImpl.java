@@ -1,8 +1,8 @@
 package com.example.foodstore.service.impl;
 
-import com.example.foodstore.dto.DetallePedidoCreate;
-import com.example.foodstore.dto.DetallePedidoDto;
-import com.example.foodstore.dto.DetallePedidoEdit;
+import com.example.foodstore.dto.request.DetallePedidoRegister;
+import com.example.foodstore.dto.request.DetallePedidoEdit;
+import com.example.foodstore.dto.response.DetallePedidoResponseDTO;
 import com.example.foodstore.entity.DetallePedido;
 import com.example.foodstore.entity.Pedido;
 import com.example.foodstore.entity.Producto;
@@ -30,15 +30,14 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
     private ProductoRepository productoRepository;
 
     @Override
-    public DetallePedidoDto crear(DetallePedidoCreate detallePedidoCreate) {
+    public DetallePedidoResponseDTO crear(DetallePedidoRegister detallePedidoCreate) {
         DetallePedido detallePedido = DetallePedidoMapper.toEntity(detallePedidoCreate);
 
         // Buscar y asignar el pedido
         Optional<Pedido> pedidoOptional = pedidoRepository.findById(detallePedidoCreate.getPedidoId());
         Optional<Producto> productoOptional = productoRepository.findById(detallePedidoCreate.getProductoId());
 
-        if (pedidoOptional.isPresent() && !pedidoOptional.get().isEliminado() &&
-                productoOptional.isPresent() && !productoOptional.get().isEliminado()) {
+        if (pedidoOptional.isPresent() && productoOptional.isPresent()) {
 
             detallePedido.setPedido(pedidoOptional.get());
             detallePedido.setProducto(productoOptional.get());
@@ -49,7 +48,7 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
     }
 
     @Override
-    public DetallePedidoDto actualizar(Long id, DetallePedidoEdit detallePedidoEdit) {
+    public DetallePedidoResponseDTO actualizar(Long id, DetallePedidoEdit detallePedidoEdit) {
         Optional<DetallePedido> detallePedidoOptional = detallePedidoRepository.findById(id);
         if (detallePedidoOptional.isPresent()) {
             DetallePedido detallePedido = detallePedidoOptional.get();
@@ -61,19 +60,17 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
     }
 
     @Override
-    public DetallePedidoDto buscarId(Long id) {
+    public DetallePedidoResponseDTO buscarId(Long id) {
         Optional<DetallePedido> detallePedidoOptional = detallePedidoRepository.findById(id);
         if (detallePedidoOptional.isPresent()) {
-            if (!detallePedidoOptional.get().isEliminado()) {
-                return DetallePedidoMapper.toDTO(detallePedidoOptional.get());
-            }
+            return DetallePedidoMapper.toDTO(detallePedidoOptional.get());
         }
         return null;
     }
 
     @Override
-    public List<DetallePedidoDto> buscaTodos() {
-        List<DetallePedido> detalles = detallePedidoRepository.findAllByEliminadoFalse();
+    public List<DetallePedidoResponseDTO> buscaTodos() {
+        List<DetallePedido> detalles = detallePedidoRepository.findAll();
         return detalles.stream()
                 .map(DetallePedidoMapper::toDTO)
                 .collect(Collectors.toList());
@@ -81,17 +78,14 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
 
     @Override
     public void eliminar(Long id) {
-        Optional<DetallePedido> detallePedidoOptional = detallePedidoRepository.findById(id);
-        if (detallePedidoOptional.isPresent()) {
-            DetallePedido detallePedido = detallePedidoOptional.get();
-            detallePedido.setEliminado(true);
-            detallePedidoRepository.save(detallePedido);
+        if (detallePedidoRepository.existsById(id)) {
+            detallePedidoRepository.deleteById(id);
         }
     }
 
     @Override
-    public List<DetallePedidoDto> buscarPorPedido(Long pedidoId) {
-        List<DetallePedido> detalles = detallePedidoRepository.findByPedidoIdAndEliminadoFalse(pedidoId);
+    public List<DetallePedidoResponseDTO> buscarPorPedido(Long pedidoId) {
+        List<DetallePedido> detalles = detallePedidoRepository.findByPedidoId(pedidoId);
         return detalles.stream()
                 .map(DetallePedidoMapper::toDTO)
                 .collect(Collectors.toList());
