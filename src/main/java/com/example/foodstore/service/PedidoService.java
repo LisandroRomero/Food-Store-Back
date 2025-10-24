@@ -1,16 +1,17 @@
 package com.example.foodstore.service;
 
-import com.example.foodstore.dto.PedidoCreate;
-import com.example.foodstore.dto.PedidoDto;
-import com.example.foodstore.dto.PedidoEdit;
+import com.example.foodstore.dto.request.PedidoRegister;
+import com.example.foodstore.dto.request.PedidoEdit;
+import com.example.foodstore.dto.response.PedidoResponseDTO;
+
 import java.util.List;
 
 public interface PedidoService {
-    PedidoDto crear(PedidoCreate pedidoCreate);
-    PedidoDto actualizar(Long id, PedidoEdit pedidoEdit);
-    PedidoDto buscarId(Long id);
-    List<PedidoDto> buscaTodos();
+    PedidoResponseDTO crear(PedidoRegister pedidoCreate);
+    PedidoResponseDTO actualizar(Long id, PedidoEdit pedidoEdit);
+    PedidoResponseDTO buscarId(Long id);
+    List<PedidoResponseDTO> buscaTodos();
     void eliminar(Long id);
-    List<PedidoDto> buscarPorUsuario(Long usuarioId);
-    List<PedidoDto> buscarPorEstado(String estado);
+    List<PedidoResponseDTO> buscarPorUsuario(Long usuarioId);
+    List<PedidoResponseDTO> buscarPorEstado(String estado);
 }

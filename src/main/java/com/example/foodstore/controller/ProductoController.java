@@ -1,7 +1,7 @@
 package com.example.foodstore.controller;
 
-import com.example.foodstore.dto.ProductoCreate;
-import com.example.foodstore.dto.ProductoEdit;
+import com.example.foodstore.dto.request.ProductoRegister;
+import com.example.foodstore.dto.request.ProductoEdit;
 import com.example.foodstore.service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ public class ProductoController {
     private ProductoService productoService;
 
     @PostMapping
-    public ResponseEntity<?> crear(@RequestBody ProductoCreate productoCreate) {
+    public ResponseEntity<?> crear(@RequestBody ProductoRegister productoCreate) {
         try {
             return ResponseEntity.ok().body(productoService.crear(productoCreate));
         } catch (Exception e) {

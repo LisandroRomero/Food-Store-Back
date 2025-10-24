@@ -7,6 +7,5 @@ import java.util.List;
 
 @Repository
 public interface DetallePedidoRepository extends JpaRepository<DetallePedido, Long> {
-    List<DetallePedido> findAllByEliminadoFalse();
-    List<DetallePedido> findByPedidoIdAndEliminadoFalse(Long pedidoId);
+    List<DetallePedido> findByPedidoId(Long pedidoId);
 }

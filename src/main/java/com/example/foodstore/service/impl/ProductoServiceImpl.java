@@ -1,8 +1,8 @@
 package com.example.foodstore.service.impl;
 
-import com.example.foodstore.dto.ProductoCreate;
-import com.example.foodstore.dto.ProductoDto;
-import com.example.foodstore.dto.ProductoEdit;
+import com.example.foodstore.dto.request.ProductoRegister;
+import com.example.foodstore.dto.request.ProductoEdit;
+import com.example.foodstore.dto.response.ProductoResponseDTO;
 import com.example.foodstore.entity.Producto;
 import com.example.foodstore.mapper.ProductoMapper;
 import com.example.foodstore.repository.ProductoRepository;
@@ -20,14 +20,14 @@ public class ProductoServiceImpl implements ProductoService {
     private ProductoRepository productoRepository;
 
     @Override
-    public ProductoDto crear(ProductoCreate productoCreate) {
+    public ProductoResponseDTO crear(ProductoRegister productoCreate) {
         Producto producto = ProductoMapper.toEntity(productoCreate);
         producto = productoRepository.save(producto);
         return ProductoMapper.toDTO(producto);
     }
 
     @Override
-    public ProductoDto actualizar(Long id, ProductoEdit productoEdit) {
+    public ProductoResponseDTO actualizar(Long id, ProductoEdit productoEdit) {
         Optional<Producto> productoOptional = productoRepository.findById(id);
         if (productoOptional.isPresent()) {
             Producto producto = productoOptional.get();
@@ -39,19 +39,17 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
-    public ProductoDto buscarId(Long id) {
+    public ProductoResponseDTO buscarId(Long id) {
         Optional<Producto> productoOptional = productoRepository.findById(id);
         if (productoOptional.isPresent()) {
-            if (!productoOptional.get().isEliminado()) {
-                return ProductoMapper.toDTO(productoOptional.get());
-            }
+            return ProductoMapper.toDTO(productoOptional.get());
         }
         return null;
     }
 
     @Override
-    public List<ProductoDto> buscaTodos() {
-        List<Producto> productos = productoRepository.findAllByEliminadoFalse();
+    public List<ProductoResponseDTO> buscaTodos() {
+        List<Producto> productos = productoRepository.findAll();
         return productos.stream()
                 .map(ProductoMapper::toDTO)
                 .collect(Collectors.toList());
@@ -59,17 +57,14 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     public void eliminar(Long id) {
-        Optional<Producto> productoOptional = productoRepository.findById(id);
-        if (productoOptional.isPresent()) {
-            Producto producto = productoOptional.get();
-            producto.setEliminado(true);
-            productoRepository.save(producto);
+        if (productoRepository.existsById(id)) {
+            productoRepository.deleteById(id);
         }
     }
 
     @Override
-    public List<ProductoDto> buscarPorNombre(String nombre) {
-        List<Producto> productos = productoRepository.findByNombreContainingIgnoreCaseAndEliminadoFalse(nombre);
+    public List<ProductoResponseDTO> buscarPorNombre(String nombre) {
+        List<Producto> productos = productoRepository.findByNombreContainingIgnoreCase(nombre);
         return productos.stream()
                 .map(ProductoMapper::toDTO)
                 .collect(Collectors.toList());

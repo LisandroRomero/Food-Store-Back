@@ -1,83 +1,87 @@
 package com.example.foodstore.controller;
 
-import com.example.foodstore.dto.UsuarioCreate;
-import com.example.foodstore.dto.UsuarioDto;
-import com.example.foodstore.dto.UsuarioEdit;
+import com.example.foodstore.dto.request.UsuarioRegister;
+import com.example.foodstore.dto.request.UsuarioEdit;
+import com.example.foodstore.dto.request.UsuarioLoginDTO;
+import com.example.foodstore.dto.response.UsuarioResponseDTO;
 import com.example.foodstore.service.UsuarioService;
+
+import jakarta.validation.Valid;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin("*")
-@RequestMapping("/usuarios")
+@RequestMapping("/api/usuarios")
 public class UsuarioController {
-
+    
     @Autowired
     private UsuarioService usuarioService;
-
-    @PostMapping
-    public ResponseEntity<?> crear(@RequestBody UsuarioCreate usuarioCreate) {
+    
+    @PostMapping("/register")
+    public ResponseEntity<UsuarioResponseDTO> registrar(
+            @Valid @RequestBody UsuarioRegister usuarioRegister) {
         try {
-            return ResponseEntity.ok().body(usuarioService.crear(usuarioCreate));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Ocurrió un error: " + e.getMessage());
+            UsuarioResponseDTO usuario = usuarioService.registrar(usuarioRegister);
+            return ResponseEntity.status(201).body(usuario);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
         }
     }
-
+    
+    @PostMapping("/login")
+    public ResponseEntity<UsuarioResponseDTO> login(
+            @Valid @RequestBody UsuarioLoginDTO loginDTO) {
+        try {
+            UsuarioResponseDTO usuario = usuarioService.login(loginDTO);
+            return ResponseEntity.ok(usuario);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(401).build();
+        }
+    }
+    
+    // BUSCAR POR ID
+    @GetMapping("/{id}")
+    public ResponseEntity<UsuarioResponseDTO> buscarPorId(@PathVariable Long id) {
+        try {
+            UsuarioResponseDTO usuario = usuarioService.buscarPorId(id);
+            return ResponseEntity.ok(usuario);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
+    // BUSCAR TODOS
+    @GetMapping
+    public ResponseEntity<List<UsuarioResponseDTO>> buscarTodos() {
+        List<UsuarioResponseDTO> usuarios = usuarioService.buscarTodos();
+        return ResponseEntity.ok(usuarios);
+    }
+    
+    // ACTUALIZAR
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody UsuarioEdit usuarioEdit) {
+    public ResponseEntity<UsuarioResponseDTO> actualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody UsuarioEdit usuarioEdit) {
         try {
-            return ResponseEntity.ok().body(usuarioService.actualizar(id, usuarioEdit));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Ocurrió un error: " + e.getMessage());
+            UsuarioResponseDTO usuario = usuarioService.actualizar(id, usuarioEdit);
+            return ResponseEntity.ok(usuario);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
         }
     }
-
+    
+    // ELIMINAR
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> borrar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         try {
             usuarioService.eliminar(id);
-            return ResponseEntity.ok().body("Usuario eliminado");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Ocurrió un error: " + e.getMessage());
-        }
-    }
-
-    @GetMapping
-    public ResponseEntity<?> buscaTodos() {
-        try {
-            return ResponseEntity.ok().body(usuarioService.buscaTodos());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Ocurrió un error: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<?> buscaId(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(usuarioService.buscarId(id));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Ocurrió un error: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/email/{email}")
-    public ResponseEntity<?> buscaPorEmail(@PathVariable String email) {
-        try {
-            return ResponseEntity.ok(usuarioService.buscarPorEmail(email));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Ocurrió un error: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UsuarioDto usuarioDto) {
-        try {
-            return usuarioService.login(usuarioDto);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body("Ocurrió un error: " + e.getMessage());
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 }

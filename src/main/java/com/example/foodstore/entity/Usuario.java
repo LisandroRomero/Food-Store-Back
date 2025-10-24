@@ -1,28 +1,36 @@
 package com.example.foodstore.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-@Builder
-public class Usuario {
+@SuperBuilder
+@NoArgsConstructor
+public class Usuario extends Base {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @Column(nullable = false, length = 50)
     private String nombre;
+
+    @Column(nullable = false, length = 50)
     private String apellido;
-    private String mail;
+
+    @Column(unique = true, nullable = false, length = 100)
+    private String email;
+
+    @Column(nullable = false, length = 100)
     private String password;
 
     @Enumerated(EnumType.STRING)
     private Rol rol;
 
     @Builder.Default
-    private boolean eliminado = false;
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.PERSIST)
+    private List<Pedido> pedidos = new ArrayList<>();
+
 }
