@@ -9,6 +9,7 @@ import com.example.foodstore.service.UsuarioService;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,30 +17,33 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/usuarios")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class UsuarioController {
     
     @Autowired
     private UsuarioService usuarioService;
     
     @PostMapping("/register")
-    public ResponseEntity<UsuarioResponseDTO> registrar(
+    public ResponseEntity<?> registrar(
             @Valid @RequestBody UsuarioRegister usuarioRegister) {
         try {
             UsuarioResponseDTO usuario = usuarioService.registrar(usuarioRegister);
             return ResponseEntity.status(201).body(usuario);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
         }
     }
     
     @PostMapping("/login")
-    public ResponseEntity<UsuarioResponseDTO> login(
+    public ResponseEntity<?> login(
             @Valid @RequestBody UsuarioLoginDTO loginDTO) {
         try {
             UsuarioResponseDTO usuario = usuarioService.login(loginDTO);
             return ResponseEntity.ok(usuario);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(401).build();
+            return ResponseEntity.status(401)
+                    .body(Map.of("message", e.getMessage()));
         }
     }
     
