@@ -81,6 +81,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public ResponseEntity<?> login(UsuarioDto usuarioDto) {
+        // Remplazar 'ResponseEntity' por 'Excepciones'
         try {
             Optional<Usuario> usuarioOptional = usuarioRepository.findByMail(usuarioDto.getMail());
 

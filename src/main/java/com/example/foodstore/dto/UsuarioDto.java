@@ -16,5 +16,5 @@ public class UsuarioDto {
     private String mail;
     private String rol;
 
-    private String password;
+    private String password; // Borrar acá -> Crear un Dto -> UsuarioLogin
 }

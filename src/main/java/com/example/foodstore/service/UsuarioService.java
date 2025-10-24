@@ -15,4 +15,5 @@ public interface UsuarioService {
     void eliminar(Long id);
     UsuarioDto buscarPorEmail(String email);
     ResponseEntity<?> login(UsuarioDto usuarioDto);
+    // UsuarioDto login(UsuarioLogin usuarioDto);
 }
