@@ -27,7 +27,10 @@ public class DataLoader implements CommandLineRunner {
                 .password(Sha256Util.hash("admin123"))
                 .rol(Rol.ADMIN)
                 .build();
-        usuarioRepository.save(admin);
+
+        if (!usuarioRepository.existsByEmail("admin@food.com")) {
+            usuarioRepository.save(admin);
+        }
         System.out.println("Admin creado: admin@food.com / admin123");
 
         Usuario cliente = Usuario.builder()
@@ -37,7 +40,10 @@ public class DataLoader implements CommandLineRunner {
                 .password(Sha256Util.hash("123456"))
                 .rol(Rol.USUARIO)
                 .build();
-        usuarioRepository.save(cliente);
+
+        if (!usuarioRepository.existsByEmail("juan@mail.com")) {        
+            usuarioRepository.save(cliente);
+        }
         System.out.println("Cliente creado: juan@mail.com / 123456");
 
         System.out.println("Usuarios de prueba creados exitosamente");
