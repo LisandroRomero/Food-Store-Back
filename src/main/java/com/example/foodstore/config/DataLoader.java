@@ -17,36 +17,39 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         
-        System.out.println("Creando usuarios de prueba...");
+        System.out.println("Verificando y creando usuarios de prueba...");
 
-        // Crear ADMIN
-        Usuario admin = Usuario.builder()
-                .nombre("Admin")
-                .apellido("Sistema")
-                .email("admin@food.com")
-                .password(Sha256Util.hash("admin123"))
-                .rol(Rol.ADMIN)
-                .build();
-
+        // Crear ADMIN solo si no existe
         if (!usuarioRepository.existsByEmail("admin@food.com")) {
+            Usuario admin = Usuario.builder()
+                    .nombre("Admin")
+                    .apellido("Sistema")
+                    .email("admin@food.com")
+                    .password(Sha256Util.hash("admin123"))
+                    .rol(Rol.ADMIN)
+                    .build();
             usuarioRepository.save(admin);
+            System.out.println("Admin creado: admin@food.com / admin123");
+        } else {
+            System.out.println("Admin ya existe en la base de datos");
         }
-        System.out.println("Admin creado: admin@food.com / admin123");
 
-        Usuario cliente = Usuario.builder()
-                .nombre("Juan")
-                .apellido("Pérez")
-                .email("juan@mail.com")
-                .password(Sha256Util.hash("123456"))
-                .rol(Rol.USUARIO)
-                .build();
-
-        if (!usuarioRepository.existsByEmail("juan@mail.com")) {        
+        // Crear CLIENTE solo si no existe
+        if (!usuarioRepository.existsByEmail("juan@mail.com")) {
+            Usuario cliente = Usuario.builder()
+                    .nombre("Juan")
+                    .apellido("Pérez")
+                    .email("juan@mail.com")
+                    .password(Sha256Util.hash("123456"))
+                    .rol(Rol.USUARIO)
+                    .build();
             usuarioRepository.save(cliente);
+            System.out.println("Cliente creado: juan@mail.com / 123456");
+        } else {
+            System.out.println("Cliente ya existe en la base de datos");
         }
-        System.out.println("Cliente creado: juan@mail.com / 123456");
 
-        System.out.println("Usuarios de prueba creados exitosamente");
+        System.out.println("Verificación de usuarios de prueba completada");
     }
 }
 
