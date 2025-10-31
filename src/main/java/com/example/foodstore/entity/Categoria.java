@@ -1,25 +1,32 @@
 package com.example.foodstore.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
-import jakarta.persistence.Entity;
 import lombok.experimental.SuperBuilder;
 
-@Table(name = "categorias")
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @SuperBuilder
-public class Categoria extends Base{
+public class Categoria extends Base {
 
     @Column(nullable = false, length = 100)
     private String nombre;
 
-    @Column(length = 255)
+    @Column(length = 500)
     private String descripcion;
 
+    @Column(length = 300)
+    private String imagen;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean activo = true;
+
+    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Producto> productos;
 }
-
-    
-

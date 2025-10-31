@@ -12,5 +12,8 @@ public interface ProductoService {
     ProductoResponseDTO buscarId(Long id);
     List<ProductoResponseDTO> buscaTodos();
     void eliminar(Long id);
+    void restaurar(Long id);
     List<ProductoResponseDTO> buscarPorNombre(String nombre);
+    List<ProductoResponseDTO> filtrarProductos(Long categoriaId, Boolean disponible, Boolean conStock);
+    List<ProductoResponseDTO> buscaTodosAdmin();
 }
