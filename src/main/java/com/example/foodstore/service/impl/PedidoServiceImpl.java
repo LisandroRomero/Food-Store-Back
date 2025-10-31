@@ -1,8 +1,8 @@
 package com.example.foodstore.service.impl;
 
-import com.example.foodstore.dto.PedidoCreate;
-import com.example.foodstore.dto.PedidoDto;
-import com.example.foodstore.dto.PedidoEdit;
+import com.example.foodstore.dto.request.PedidoRegister;
+import com.example.foodstore.dto.request.PedidoEdit;
+import com.example.foodstore.dto.response.PedidoResponseDTO;
 import com.example.foodstore.entity.Pedido;
 import com.example.foodstore.entity.Usuario;
 import com.example.foodstore.entity.Estado;
@@ -26,12 +26,12 @@ public class PedidoServiceImpl implements PedidoService {
     private UsuarioRepository usuarioRepository;
 
     @Override
-    public PedidoDto crear(PedidoCreate pedidoCreate) {
+    public PedidoResponseDTO crear(PedidoRegister pedidoCreate) {
         Pedido pedido = PedidoMapper.toEntity(pedidoCreate);
 
         // Buscar y asignar el usuario
         Optional<Usuario> usuarioOptional = usuarioRepository.findById(pedidoCreate.getUsuarioId());
-        if (usuarioOptional.isPresent() && !usuarioOptional.get().isEliminado()) {
+        if (usuarioOptional.isPresent()) {
             pedido.setUsuario(usuarioOptional.get());
             pedido = pedidoRepository.save(pedido);
             return PedidoMapper.toDTO(pedido);
@@ -40,7 +40,7 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public PedidoDto actualizar(Long id, PedidoEdit pedidoEdit) {
+    public PedidoResponseDTO actualizar(Long id, PedidoEdit pedidoEdit) {
         Optional<Pedido> pedidoOptional = pedidoRepository.findById(id);
         if (pedidoOptional.isPresent()) {
             Pedido pedido = pedidoOptional.get();
@@ -52,19 +52,17 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    public PedidoDto buscarId(Long id) {
+    public PedidoResponseDTO buscarId(Long id) {
         Optional<Pedido> pedidoOptional = pedidoRepository.findById(id);
         if (pedidoOptional.isPresent()) {
-            if (!pedidoOptional.get().isEliminado()) {
-                return PedidoMapper.toDTO(pedidoOptional.get());
-            }
+            return PedidoMapper.toDTO(pedidoOptional.get());
         }
         return null;
     }
 
     @Override
-    public List<PedidoDto> buscaTodos() {
-        List<Pedido> pedidos = pedidoRepository.findAllByEliminadoFalse();
+    public List<PedidoResponseDTO> buscaTodos() {
+        List<Pedido> pedidos = pedidoRepository.findAll();
         return pedidos.stream()
                 .map(PedidoMapper::toDTO)
                 .collect(Collectors.toList());
@@ -72,25 +70,22 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public void eliminar(Long id) {
-        Optional<Pedido> pedidoOptional = pedidoRepository.findById(id);
-        if (pedidoOptional.isPresent()) {
-            Pedido pedido = pedidoOptional.get();
-            pedido.setEliminado(true);
-            pedidoRepository.save(pedido);
+        if (pedidoRepository.existsById(id)) {
+            pedidoRepository.deleteById(id);
         }
     }
 
     @Override
-    public List<PedidoDto> buscarPorUsuario(Long usuarioId) {
-        List<Pedido> pedidos = pedidoRepository.findByUsuarioIdAndEliminadoFalse(usuarioId);
+    public List<PedidoResponseDTO> buscarPorUsuario(Long usuarioId) {
+        List<Pedido> pedidos = pedidoRepository.findByUsuarioId(usuarioId);
         return pedidos.stream()
                 .map(PedidoMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<PedidoDto> buscarPorEstado(String estado) {
-        List<Pedido> pedidos = pedidoRepository.findByEstadoAndEliminadoFalse(Estado.valueOf(estado));
+    public List<PedidoResponseDTO> buscarPorEstado(String estado) {
+        List<Pedido> pedidos = pedidoRepository.findByEstado(Estado.valueOf(estado));
         return pedidos.stream()
                 .map(PedidoMapper::toDTO)
                 .collect(Collectors.toList());

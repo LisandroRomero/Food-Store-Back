@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
-    List<Pedido> findAllByEliminadoFalse();
-    List<Pedido> findByUsuarioIdAndEliminadoFalse(Long usuarioId);
-    List<Pedido> findByEstadoAndEliminadoFalse(Estado estado);
+    List<Pedido> findByUsuarioId(Long usuarioId);
+    List<Pedido> findByEstado(Estado estado);
 }

@@ -1,21 +1,27 @@
 package com.example.foodstore.service.impl;
 
-import com.example.foodstore.dto.UsuarioCreate;
-import com.example.foodstore.dto.UsuarioDto;
-import com.example.foodstore.dto.UsuarioEdit;
+import com.example.foodstore.dto.request.UsuarioRegister;
+import com.example.foodstore.dto.request.UsuarioEdit;
+import com.example.foodstore.dto.request.UsuarioLoginDTO;
+import com.example.foodstore.dto.response.UsuarioResponseDTO;
 import com.example.foodstore.entity.Usuario;
+import com.example.foodstore.excepcion.DuplicateResourceException;
+import com.example.foodstore.excepcion.ResourceNotFoundException;
+import com.example.foodstore.excepcion.UnauthorizedException;
 import com.example.foodstore.mapper.UsuarioMapper;
 import com.example.foodstore.repository.UsuarioRepository;
 import com.example.foodstore.service.UsuarioService;
 import com.example.foodstore.util.Sha256Util;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
 
@@ -23,93 +29,118 @@ public class UsuarioServiceImpl implements UsuarioService {
     private UsuarioRepository usuarioRepository;
 
     @Override
-    public UsuarioDto crear(UsuarioCreate usuarioCreate) {
-        Usuario usuario = UsuarioMapper.toEntity(usuarioCreate);
+    public UsuarioResponseDTO registrar(UsuarioRegister usuarioRegister) {
+        log.debug("intentando registrar usuario: {}", usuarioRegister.getEmail());
+
+        if (usuarioRepository.findByEmail(usuarioRegister.getEmail()).isPresent()) {
+            log.warn("Intento de registro con email ya registrado: {}", usuarioRegister.getEmail());
+            throw new DuplicateResourceException("El email ya está registrado"); 
+        }
+        
+        Usuario usuario = UsuarioMapper.toEntity(usuarioRegister);
         usuario = usuarioRepository.save(usuario);
+        
+        log.info("usuario registrado exitosamente con id: {}", usuario.getId());
+
         return UsuarioMapper.toDTO(usuario);
     }
 
     @Override
-    public UsuarioDto actualizar(Long id, UsuarioEdit usuarioEdit) {
-        Optional<Usuario> usuarioOptional = usuarioRepository.findById(id);
-        if (usuarioOptional.isPresent()) {
-            Usuario usuario = usuarioOptional.get();
-            UsuarioMapper.updateEntityFromEdit(usuario, usuarioEdit);
-            usuario = usuarioRepository.save(usuario);
-            return UsuarioMapper.toDTO(usuario);
-        }
-        return null;
-    }
+    public UsuarioResponseDTO login(UsuarioLoginDTO loginDTO) {
+        log.debug("intentando iniciar sesión para email: {}", loginDTO.getEmail());
+        try {
 
-    @Override
-    public UsuarioDto buscarId(Long id) {
-        Optional<Usuario> usuarioOptional = usuarioRepository.findById(id);
-        if (usuarioOptional.isPresent()) {
-            if (!usuarioOptional.get().isEliminado()) {
-                return UsuarioMapper.toDTO(usuarioOptional.get());
+            if (!usuarioRepository.existsByEmail(loginDTO.getEmail())) {
+                throw new UnauthorizedException("Correo electrónico Inválido");
             }
+            Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(loginDTO.getEmail());
+            
+            if (!usuarioOpt.get().getPassword().equals(Sha256Util.hash(loginDTO.getPassword()))) {
+                throw new UnauthorizedException("Contraseña Incorrecta");
+            }
+            
+            log.info("inicio de sesión exitoso para id: {}", usuarioOpt.get().getId());
+            
+            return UsuarioMapper.toDTO(usuarioOpt.get());
+        }catch (Exception e) {
+            log.error("Error insperado en login: {}", e.getMessage());
+            throw e;
         }
-        return null;
     }
 
+    // Buscar por ID
     @Override
-    public List<UsuarioDto> buscaTodos() {
-        List<Usuario> usuarios = usuarioRepository.findAllByEliminadoFalse();
+    public UsuarioResponseDTO buscarPorId(Long id) {
+        log.debug("intentando buscar usuario por id: {}", id);
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Usuario no encontrado con id: {}", id);
+                    return new ResourceNotFoundException("Usuario no encontrado");
+                });
+        
+        log.info("usuario encontrado con id: {}", usuario.getId());
+        return UsuarioMapper.toDTO(usuario);
+    }
+
+    // Buscar por email
+    @Override
+    public UsuarioResponseDTO buscarPorEmail(String email) {
+        log.debug("intentando buscar usuario por email: {}", email);
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.warn("Usuario no encontrado con email: {}", email);
+                    return new ResourceNotFoundException("Usuario no encontrado");
+                });
+        
+        log.info("usuario encontrado con email: {}", usuario.getEmail());
+        return UsuarioMapper.toDTO(usuario);
+    }
+
+    // Buscar todos
+    @Override
+    public List<UsuarioResponseDTO> buscarTodos() {
+        log.debug("intentando buscar todos los usuarios");
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        log.info("{} usuarios encontrados", usuarios.size());
         return usuarios.stream()
                 .map(UsuarioMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
+    // Actualizar usuario
+    @Override
+    public UsuarioResponseDTO actualizar(Long id, UsuarioEdit usuarioEdit) {
+        
+        log.debug("intentando actualizar usuario con id: {}", id);
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Usuario no encontrado con id: {}", id);
+                    return new ResourceNotFoundException("Usuario no encontrado");
+                });
+        
+        if (usuarioEdit.getEmail() != null && !usuarioEdit.getEmail().equals(usuario.getEmail())) {
+            if (usuarioRepository.findByEmail(usuarioEdit.getEmail()).isPresent()) {
+                throw new DuplicateResourceException("El email ya está en uso");
+            }
+        }
+        
+        log.debug("actualizando campos del usuario");
+        UsuarioMapper.updateFromDTO(usuario, usuarioEdit);
+        usuario = usuarioRepository.save(usuario);
+        
+        log.info("usuario actualizado exitosamente con id: {}", usuario.getId());
+        return UsuarioMapper.toDTO(usuario);
+    }
+
+    // Eliminar usuario
     @Override
     public void eliminar(Long id) {
-        Optional<Usuario> usuarioOptional = usuarioRepository.findById(id);
-        if (usuarioOptional.isPresent()) {
-            Usuario usuario = usuarioOptional.get();
-            usuario.setEliminado(true);
-            usuarioRepository.save(usuario);
+        log.debug("intentando eliminar usuario con id: {}", id);
+        if (!usuarioRepository.existsById(id)) {
+            log.warn("Usuario no encontrado con id: {}", id);
+            throw new ResourceNotFoundException("Usuario no encontrado");
         }
-    }
-
-    @Override
-    public UsuarioDto buscarPorEmail(String email) {
-        Optional<Usuario> usuarioOptional = usuarioRepository.findByMail(email);
-        if (usuarioOptional.isPresent() && !usuarioOptional.get().isEliminado()) {
-            return UsuarioMapper.toDTO(usuarioOptional.get());
-        }
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<?> login(UsuarioDto usuarioDto) {
-        // Remplazar 'ResponseEntity' por 'Excepciones'
-        try {
-            Optional<Usuario> usuarioOptional = usuarioRepository.findByMail(usuarioDto.getMail());
-
-            if (usuarioOptional.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("Credenciales inválidas");
-            }
-
-            Usuario usuario = usuarioOptional.get();
-
-            if (usuario.isEliminado()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("Credenciales inválidas");
-            }
-
-            String passwordHash = Sha256Util.hash(usuarioDto.getPassword());
-
-            if (usuario.getPassword().equals(passwordHash)) {
-                UsuarioDto usuarioResponse = UsuarioMapper.toDTO(usuario);
-                return ResponseEntity.ok(usuarioResponse);
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("Credenciales inválidas");
-            }
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body("Ocurrió un error: " + e.getMessage());
-        }
+        usuarioRepository.deleteById(id);
+        log.info("usuario eliminado exitosamente con id: {}", id);
     }
 }

@@ -2,22 +2,43 @@ package com.example.foodstore.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "productos")
 @Getter
 @Setter
-@Builder
-public class Producto {
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
+public class Producto extends Base {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @Column(nullable = false, length = 100)
     private String nombre;
+
+    @Column(length = 500)
+    private String descripcion;
+
+    @Column(nullable = false)
     private double precio;
 
+    @Column(nullable = false)
+    private int stock;
+
+    @Column(nullable = false)
+    private boolean disponible;
+
+    @Column(length = 255)
+    private String imagen;
+
     @Builder.Default
-    private boolean eliminado = false;
+    @Column(nullable = false)
+    private boolean activo = true;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "categoria_id", nullable = false)
+    private Categoria categoria;
 }
+
+
+
