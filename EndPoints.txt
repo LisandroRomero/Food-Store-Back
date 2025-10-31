@@ -1,0 +1,99 @@
+Categorías:
+
+Crear categoría:
+POST http://localhost:8080/categorias
+{
+  "nombre": "Bebidas",
+  "descripcion": "Todo tipo de bebidas",
+  "imagen": "bebidas.jpg"
+}
+
+Leer todas las categorías activas
+GET http://localhost:8080/categorias
+
+Listar todas las categorías (admin) -> Debe devolver todas, activas e inactivas.
+GET http://localhost:8080/categorias/admin
+
+Leer categoría por ID
+GET http://localhost:8080/categorias/{id}
+
+Actualizar categoría
+PUT http://localhost:8080/categorias/{id}
+{
+  "nombre": "Bebidas Frías",
+  "descripcion": "Refrescos y jugos",
+  "imagen": "bebidas_frias.jpg"
+}
+
+Soft-delete categoría
+DELETE http://localhost:8080/categorias/{id}
+
+Probamos listar todas las categorías (admin) para devolver todas, activas e inactivas.
+GET http://localhost:8080/categorias/admin
+
+Restaurar categoría
+PUT http://localhost:8080/categorias/{id}/restaurar
+
+Productos:
+
+Crear producto:
+POST http://localhost:8080/productos
+{
+  "nombre": "Coca Cola",
+  "descripcion": "Refresco de cola",
+  "precio": 150.0,
+  "stock": 50,
+  "disponible": true,
+  "imagen": "coca.jpg",
+  "categoriaId": 1
+}
+
+Leer todos los productos activos:
+GET http://localhost:8080/productos
+
+Listar todos los productos (admin) -> Debe devolver todos, activas e inactivas.
+GET http://localhost:8080/productos/admin
+
+Leer producto por ID
+GET http://localhost:8080/productos/{id}
+
+Buscar producto por nombre -> Debe devolver una lista con productos cuyo nombre contenga 'Coca'
+GET http://localhost:8080/productos/buscar/Coca
+
+Actualizar producto
+PUT http://localhost:8080/productos/{id}
+{
+  "nombre": "Coca Cola zero",
+  "descripcion": "Refresco de cola sin azucar",
+  "precio": 125.0,
+  "stock": 50,
+  "disponible": true,
+  "imagen": "cocazero.jpg",
+  "categoriaId": 1
+}
+
+Soft-delete producto
+DELETE http://localhost:8080/productos/{id}
+
+Listar todos los productos (admin) -> Debe devolver todos, activas e inactivas.
+GET http://localhost:8080/productos/admin
+
+Restaurar producto
+PUT http://localhost:8080/productos/{id}/restaurar
+
+Filtrar productos:
+GET http://localhost:8080/productos/filtrar
+
+Puedes usar cualquiera de estos parámetros (combinados o separados):
+| Parámetro     | Tipo      | Ejemplo                    |
+| ------------- | --------- | -------------------------- |
+| `categoriaId` | `Long`    | `/filtrar?categoriaId=1`   |
+| `disponible`  | `Boolean` | `/filtrar?disponible=true` |
+| `conStock`    | `Boolean` | `/filtrar?conStock=true`   |
+
+GET http://localhost:8080/productos/filtrar?categoriaId=1&disponible=true&conStock=true (con todos)
+GET http://localhost:8080/productos/filtrar?categoriaId=1&disponible=true (con dos)
+GET http://localhost:8080/productos/filtrar?categoriaId=1 (con uno)
+
+LLegados a este punto, podemos borrar la categoria creada con el producto adjuntado creado, y veremos que se borrará
+la categoría junto con todos los productos que hay en la categoria.
