@@ -12,5 +12,5 @@ public class CategoriaResponseDTO {
     private String nombre;
     private String descripcion;
     private String imagen;
-    private boolean activo;
+    private int totalProductos; // Cantidad de productos en esta categoría
 }

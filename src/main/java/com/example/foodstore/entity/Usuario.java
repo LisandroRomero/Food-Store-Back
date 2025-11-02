@@ -7,11 +7,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+@Table(name = "usuarios")
 @Entity
 @Getter
 @Setter
-@SuperBuilder
 @NoArgsConstructor
+@SuperBuilder
 public class Usuario extends Base {
 
     @Column(nullable = false, length = 50)

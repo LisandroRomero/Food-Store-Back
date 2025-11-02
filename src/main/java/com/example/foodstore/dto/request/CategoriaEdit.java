@@ -13,8 +13,9 @@ public class CategoriaEdit {
     @Size(min = 3, max = 100, message = "El nombre debe tener entre 3 y 100 caracteres")
     private String nombre;
 
-    @Size(max = 500, message = "La descripción no puede superar los 500 caracteres")
+    @Size(min = 10, max = 500, message = "La descripción debe tener entre 10 y 500 caracteres")
     private String descripcion;
 
+    @Size(max = 300, message = "La URL de la imagen no puede superar los 300 caracteres")
     private String imagen;
 }
