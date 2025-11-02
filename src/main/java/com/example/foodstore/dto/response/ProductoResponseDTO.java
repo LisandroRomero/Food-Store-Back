@@ -14,6 +14,6 @@ public class ProductoResponseDTO {
     private double precio;
     private int stock;
     private boolean disponible;
-    private boolean activo;
-    private CategoriaResponseDTO categoria;
+    private String imagen;
+    private CategoriaSimpleDTO categoria;
 }

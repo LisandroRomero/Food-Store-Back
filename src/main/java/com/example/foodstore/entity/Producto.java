@@ -25,19 +25,15 @@ public class Producto extends Base {
     @Column(nullable = false)
     private int stock;
 
-    @Column(nullable = false)
-    private boolean disponible;
-
     @Column(length = 255)
     private String imagen;
-
-    @Builder.Default
-    @Column(nullable = false)
-    private boolean activo = true;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
+
+    @Column(nullable = false)
+    private boolean disponible;
 }
 
 

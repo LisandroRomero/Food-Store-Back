@@ -4,19 +4,33 @@ import com.example.foodstore.dto.request.DetallePedidoRegister;
 import com.example.foodstore.dto.request.DetallePedidoEdit;
 import com.example.foodstore.dto.response.DetallePedidoResponseDTO;
 import com.example.foodstore.entity.DetallePedido;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DetallePedidoMapper {
 
-    public static DetallePedidoResponseDTO toDTO(DetallePedido detallePedido) {
+    @Autowired
+    private ProductoMapper productoMapper;
+
+    public DetallePedidoResponseDTO toResponseDTO(DetallePedido detallePedido) {
+        if (detallePedido == null) {
+            return null;
+        }
+        
         return DetallePedidoResponseDTO.builder()
                 .id(detallePedido.getId())
                 .cantidad(detallePedido.getCantidad())
                 .subtotal(detallePedido.getSubtotal())
-                .producto(ProductoMapper.toDTO(detallePedido.getProducto()))
+                .producto(productoMapper.toResponseDTO(detallePedido.getProducto()))
                 .build();
     }
 
-    public static DetallePedido toEntity(DetallePedidoRegister detallePedidoCreate) {
+    public DetallePedido toEntity(DetallePedidoRegister detallePedidoCreate) {
+        if (detallePedidoCreate == null) {
+            return null;
+        }
+        
         return DetallePedido.builder()
                 .cantidad(detallePedidoCreate.getCantidad())
                 .subtotal(detallePedidoCreate.getSubtotal())
@@ -24,8 +38,17 @@ public class DetallePedidoMapper {
                 .build();
     }
 
-    public static void updateEntityFromEdit(DetallePedido detallePedido, DetallePedidoEdit detallePedidoEdit) {
-        detallePedido.setCantidad(detallePedidoEdit.getCantidad());
-        detallePedido.setSubtotal(detallePedidoEdit.getSubtotal());
+    public void updateEntityFromEdit(DetallePedido detallePedido, DetallePedidoEdit detallePedidoEdit) {
+        if (detallePedido == null || detallePedidoEdit == null) {
+            return;
+        }
+        
+        if (detallePedidoEdit.getCantidad() != null) {
+            detallePedido.setCantidad(detallePedidoEdit.getCantidad());
+        }
+        
+        if (detallePedidoEdit.getSubtotal() != null) {
+            detallePedido.setSubtotal(detallePedidoEdit.getSubtotal());
+        }
     }
 }

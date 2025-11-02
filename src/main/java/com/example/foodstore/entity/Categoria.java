@@ -23,10 +23,6 @@ public class Categoria extends Base {
     @Column(length = 300)
     private String imagen;
 
-    @Builder.Default
-    @Column(nullable = false)
-    private boolean activo = true;
-
     @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Producto> productos;
 }

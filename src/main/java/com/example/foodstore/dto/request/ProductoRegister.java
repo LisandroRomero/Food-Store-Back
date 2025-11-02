@@ -22,15 +22,18 @@ public class ProductoRegister {
     @Size(min = 10, max = 500, message = "La descripción debe tener entre 10 y 500 caracteres")
     private String descripcion;
     
+    @NotNull(message = "El precio es obligatorio")
     @Positive(message = "El precio debe ser un número positivo")
-    private double precio;
+    private Double precio;
     
+    @NotNull(message = "El stock es obligatorio")
     @PositiveOrZero(message = "El stock debe ser cero o un número positivo")
-    private int stock;
+    private Integer stock;
     
-    private boolean disponible; // true = disponible, false = no disponible
+    @Builder.Default
+    private boolean disponible = true; // Por defecto disponible
     
-    @NotBlank(message = "La URL de la imagen es obligatoria")
+    @Size(max = 255, message = "La URL de la imagen no puede superar los 255 caracteres")
     private String imagen;
     
     @NotNull(message = "La categoría es obligatoria")

@@ -26,6 +26,7 @@ public class ProductoEdit {
 
     private Boolean disponible;
 
+    @Size(max = 255, message = "La URL de la imagen no puede superar los 255 caracteres")
     private String imagen;
 
     @Positive(message = "La categoría debe ser un número positivo")

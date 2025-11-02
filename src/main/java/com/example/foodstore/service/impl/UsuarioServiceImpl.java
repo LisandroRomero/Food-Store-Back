@@ -32,10 +32,11 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioResponseDTO registrar(UsuarioRegister usuarioRegister) {
         log.debug("intentando registrar usuario: {}", usuarioRegister.getEmail());
 
-        if (usuarioRepository.findByEmail(usuarioRegister.getEmail()).isPresent()) {
+        if (usuarioRepository.existsByEmail(usuarioRegister.getEmail())) {
             log.warn("Intento de registro con email ya registrado: {}", usuarioRegister.getEmail());
             throw new DuplicateResourceException("El email ya está registrado"); 
         }
+
         
         Usuario usuario = UsuarioMapper.toEntity(usuarioRegister);
         usuario = usuarioRepository.save(usuario);

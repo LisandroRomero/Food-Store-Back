@@ -29,9 +29,12 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
     @Autowired
     private ProductoRepository productoRepository;
 
+    @Autowired
+    private DetallePedidoMapper detallePedidoMapper;
+
     @Override
     public DetallePedidoResponseDTO crear(DetallePedidoRegister detallePedidoCreate) {
-        DetallePedido detallePedido = DetallePedidoMapper.toEntity(detallePedidoCreate);
+        DetallePedido detallePedido = detallePedidoMapper.toEntity(detallePedidoCreate);
 
         // Buscar y asignar el pedido
         Optional<Pedido> pedidoOptional = pedidoRepository.findById(detallePedidoCreate.getPedidoId());
@@ -42,7 +45,7 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
             detallePedido.setPedido(pedidoOptional.get());
             detallePedido.setProducto(productoOptional.get());
             detallePedido = detallePedidoRepository.save(detallePedido);
-            return DetallePedidoMapper.toDTO(detallePedido);
+            return detallePedidoMapper.toResponseDTO(detallePedido);
         }
         return null;
     }
@@ -52,9 +55,9 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
         Optional<DetallePedido> detallePedidoOptional = detallePedidoRepository.findById(id);
         if (detallePedidoOptional.isPresent()) {
             DetallePedido detallePedido = detallePedidoOptional.get();
-            DetallePedidoMapper.updateEntityFromEdit(detallePedido, detallePedidoEdit);
+            detallePedidoMapper.updateEntityFromEdit(detallePedido, detallePedidoEdit);
             detallePedido = detallePedidoRepository.save(detallePedido);
-            return DetallePedidoMapper.toDTO(detallePedido);
+            return detallePedidoMapper.toResponseDTO(detallePedido);
         }
         return null;
     }
@@ -63,7 +66,7 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
     public DetallePedidoResponseDTO buscarId(Long id) {
         Optional<DetallePedido> detallePedidoOptional = detallePedidoRepository.findById(id);
         if (detallePedidoOptional.isPresent()) {
-            return DetallePedidoMapper.toDTO(detallePedidoOptional.get());
+            return detallePedidoMapper.toResponseDTO(detallePedidoOptional.get());
         }
         return null;
     }
@@ -72,7 +75,7 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
     public List<DetallePedidoResponseDTO> buscaTodos() {
         List<DetallePedido> detalles = detallePedidoRepository.findAll();
         return detalles.stream()
-                .map(DetallePedidoMapper::toDTO)
+                .map(detallePedidoMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
 
@@ -87,7 +90,7 @@ public class DetallePedidoServiceImpl implements DetallePedidoService {
     public List<DetallePedidoResponseDTO> buscarPorPedido(Long pedidoId) {
         List<DetallePedido> detalles = detallePedidoRepository.findByPedidoId(pedidoId);
         return detalles.stream()
-                .map(DetallePedidoMapper::toDTO)
+                .map(detallePedidoMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
 }
