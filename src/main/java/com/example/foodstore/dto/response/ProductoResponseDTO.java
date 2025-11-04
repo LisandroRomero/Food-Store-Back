@@ -16,4 +16,5 @@ public class ProductoResponseDTO {
     private boolean disponible;
     private String imagen;
     private CategoriaSimpleDTO categoria;
+    private boolean activo;
 }

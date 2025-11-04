@@ -200,4 +200,10 @@ public class CategoriaController {
                     .body(Map.of("message", "Error interno del servidor"));
         }
     }
+    @PutMapping("/{id}/restaurar")
+    public ResponseEntity<?> restaurar(@PathVariable Long id) {
+        categoriaService.restaurar(id);
+        return ResponseEntity.ok().build();
+    }
+
 }

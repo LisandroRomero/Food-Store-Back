@@ -37,4 +37,6 @@ public interface CategoriaService {
      * Elimina una categoría por ID
      */
     void eliminar(Long id);
+
+    void restaurar(Long id);
 }

@@ -39,6 +39,7 @@ public class CategoriaMapper {
                 .descripcion(categoria.getDescripcion())
                 .imagen(categoria.getImagen())
                 .totalProductos(categoria.getProductos() != null ? categoria.getProductos().size() : 0)
+                .activo(categoria.isActivo())
                 .build();
     }
 

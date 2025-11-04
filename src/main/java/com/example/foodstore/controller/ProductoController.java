@@ -268,7 +268,7 @@ public class ProductoController {
             productoService.eliminar(id);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("message", "Producto eliminado exitosamente"));
+                    .body(Map.of("message", "Producto eliminado logicamente exitosamente"));
 
         } catch (ResourceNotFoundException e) {
             log.error("Recurso no encontrado: {}", e.getMessage());

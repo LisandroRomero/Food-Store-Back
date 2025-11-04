@@ -50,6 +50,7 @@ public class ProductoMapper {
                 .disponible(producto.isDisponible())
                 .imagen(producto.getImagen())
                 .categoria(categoriaMapper.toSimpleDTO(producto.getCategoria()))
+                .activo(producto.isActivo())
                 .build();
     }
 
