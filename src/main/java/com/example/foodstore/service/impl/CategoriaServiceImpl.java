@@ -107,20 +107,35 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     public void eliminar(Long id) {
-        log.debug("Eliminando categoría con ID: {}", id);
+        log.info("Eliminando categoria con ID: {}", id);
+        Categoria categoria = categoriaRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
 
-        // Verificar que la categoría existe
-        if (!categoriaRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Categoría no encontrada con ID: " + id);
-        }
+            // Marcamos la categoría como inactiva
+            categoria.setActivo(false);
 
-        // Verificar si tiene productos asociados
-        Categoria categoria = categoriaRepository.findById(id).get();
-        if (categoria.getProductos() != null && !categoria.getProductos().isEmpty()) {
-            throw new IllegalArgumentException("No se puede eliminar la categoría porque tiene productos asociados");
-        }
-
-        categoriaRepository.deleteById(id);
-        log.info("Categoría eliminada exitosamente con ID: {}", id);
+            // Marcamos todos los productos asociados como inactivos
+            if (categoria.getProductos() != null) {
+                categoria.getProductos().forEach(producto -> producto.setActivo(false));
+            }
+            log.info("Categoría con ID: {} marcada como inactiva", id);
+            categoriaRepository.save(categoria);
     }
+
+    @Override
+    public void restaurar(Long id) {
+        Categoria categoria = categoriaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+
+        categoria.setActivo(true);
+
+        if (categoria.getProductos() != null) {
+            categoria.getProductos().forEach(p -> p.setActivo(true));
+        }
+
+        categoriaRepository.save(categoria);
+    }
+
+
+
 }

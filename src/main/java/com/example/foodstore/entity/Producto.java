@@ -34,6 +34,10 @@ public class Producto extends Base {
 
     @Column(nullable = false)
     private boolean disponible;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean activo = true;
 }
 
 

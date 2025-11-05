@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
+@Table(name = "categorias")
 @Entity
 @Getter
 @Setter
@@ -25,4 +26,8 @@ public class Categoria extends Base {
 
     @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Producto> productos;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean activo = true;
 }

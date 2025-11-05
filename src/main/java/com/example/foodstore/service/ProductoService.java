@@ -50,6 +50,9 @@ public interface ProductoService {
      */
     void eliminar(Long id);
 
+
+    void restaurar(Long id);
+
     /**
      * Cambia la disponibilidad de un producto
      */

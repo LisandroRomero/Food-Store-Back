@@ -152,13 +152,22 @@ public class ProductoServiceImpl implements ProductoService {
     public void eliminar(Long id) {
         log.debug("Eliminando producto con ID: {}", id);
 
-        // Verificar que el producto existe
-        if (!productoRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Producto no encontrado con ID: " + id);
-        }
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-        productoRepository.deleteById(id);
+        producto.setActivo(false); // 🔹 Desactivamos el producto
+        productoRepository.save(producto);
+
         log.info("Producto eliminado exitosamente con ID: {}", id);
+    }
+
+    @Override
+    public void restaurar(Long id) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        producto.setActivo(true); // 🔹 Volvemos a activar el producto
+        productoRepository.save(producto);
     }
 
 
