@@ -1,14 +1,17 @@
 package com.example.foodstore.controller;
 
+import com.example.foodstore.dto.request.CarritoCompraRequest;
 import com.example.foodstore.dto.request.PedidoRegister;
 import com.example.foodstore.dto.request.PedidoEdit;
+import com.example.foodstore.dto.response.PedidoResponseDTO;
 import com.example.foodstore.service.PedidoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/pedidos")
 public class PedidoController {
 
@@ -24,6 +27,26 @@ public class PedidoController {
         }
     }
 
+    @PostMapping("/carrito")
+    public ResponseEntity<?> crearPedidoDesdeCarrito(@Valid @RequestBody CarritoCompraRequest carritoRequest) {
+        try {
+            // Validar que hay items en el carrito
+            if (carritoRequest.getItems() == null || carritoRequest.getItems().isEmpty()) {
+                return ResponseEntity.badRequest().body("El carrito no puede estar vacío");
+            }
+
+            PedidoResponseDTO pedidoCreado = pedidoService.crearPedidoDesdeCarrito(carritoRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).body(pedidoCreado);
+
+        } catch (RuntimeException e) {
+            // Capturar excepciones de negocio (stock insuficiente, producto no encontrado, etc.)
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            // Capturar cualquier otra excepción inesperada
+            return ResponseEntity.internalServerError().body("Error interno al procesar el pedido");
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody PedidoEdit pedidoEdit) {
         try {
@@ -33,11 +56,10 @@ public class PedidoController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> borrar(@PathVariable Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> buscaId(@PathVariable Long id) {
         try {
-            pedidoService.eliminar(id);
-            return ResponseEntity.ok().body("Pedido eliminado");
+            return ResponseEntity.ok(pedidoService.buscarId(id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Ocurrió un error: " + e.getMessage());
         }
@@ -47,15 +69,6 @@ public class PedidoController {
     public ResponseEntity<?> buscaTodos() {
         try {
             return ResponseEntity.ok().body(pedidoService.buscaTodos());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Ocurrió un error: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<?> buscaId(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(pedidoService.buscarId(id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Ocurrió un error: " + e.getMessage());
         }
@@ -74,6 +87,16 @@ public class PedidoController {
     public ResponseEntity<?> buscarPorEstado(@PathVariable String estado) {
         try {
             return ResponseEntity.ok(pedidoService.buscarPorEstado(estado));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Ocurrió un error: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> borrar(@PathVariable Long id) {
+        try {
+            pedidoService.eliminar(id);
+            return ResponseEntity.ok().body("Pedido eliminado");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Ocurrió un error: " + e.getMessage());
         }

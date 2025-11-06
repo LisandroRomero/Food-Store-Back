@@ -1,177 +1,99 @@
-TESTS COMPLETOS PARA POSTMAN
+Categorías:
 
-SECUENCIA DE TESTING - Ejecutar en este orden:
-
-1. CREAR USUARIOS
-POST http://localhost:8080/usuarios
+Crear categoría:
+POST http://localhost:8080/api/categorias
 {
-    "nombre": "María",
-    "apellido": "Gonzalez",
-    "mail": "maria@email.com",
-    "password": "123456",
-    "rol": "USUARIO"
+  "nombre": "Bebidas",
+  "descripcion": "Todo tipo de bebidas",
+  "imagen": "bebidas.jpg"
 }
 
-POST http://localhost:8080/usuarios
+Leer todas las categorías activas
+GET http://localhost:8080/api/categorias
+
+Listar todas las categorías (admin) -> Debe devolver todas, activas e inactivas.
+GET http://localhost:8080/categorias/admin
+
+Leer categoría por ID
+GET http://localhost:8080/categorias/{id}
+
+Actualizar categoría
+PUT http://localhost:8080/categorias/{id}
 {
-    "nombre": "Admin",
-    "apellido": "Sistema",
-    "mail": "admin@email.com", 
-    "password": "admin123",
-    "rol": "ADMIN"
+  "nombre": "Bebidas Frías",
+  "descripcion": "Refrescos y jugos",
+  "imagen": "bebidas_frias.jpg"
 }
 
-Verificar: GET http://localhost:8080/usuarios
+Soft-delete categoría
+DELETE http://localhost:8080/categorias/{id}
 
----------------------------------------------------------------------------
+Probamos listar todas las categorías (admin) para devolver todas, activas e inactivas.
+GET http://localhost:8080/categorias/admin
 
-2. CREAR PRODUCTOS
-POST http://localhost:8080/productos
+Restaurar categoría
+PUT http://localhost:8080/categorias/{id}/restaurar
+
+Productos:
+
+Crear producto:
+POST http://localhost:8080/api/productos
 {
-    "nombre": "Pizza Margarita",
-    "precio": 12.50
+  "nombre": "Coca Cola",
+  "descripcion": "Refresco de cola",
+  "precio": 150.0,
+  "stock": 50,
+  "disponible": true,
+  "imagen": "coca.jpg",
+  "categoriaId": 1
 }
 
-POST http://localhost:8080/productos
+Leer todos los productos activos:
+GET http://localhost:8080/api/productos
+
+Listar todos los productos (admin) -> Debe devolver todos, activas e inactivas.
+GET http://localhost:8080/productos/admin
+
+Leer producto por ID
+GET http://localhost:8080/productos/{id}
+
+Buscar producto por nombre -> Debe devolver una lista con productos cuyo nombre contenga 'Coca'
+GET http://localhost:8080/productos/buscar/Coca
+
+Actualizar producto
+PUT http://localhost:8080/productos/{id}
 {
-    "nombre": "Hamburguesa Clásica",
-    "precio": 8.75
+  "nombre": "Coca Cola zero",
+  "descripcion": "Refresco de cola sin azucar",
+  "precio": 125.0,
+  "stock": 50,
+  "disponible": true,
+  "imagen": "cocazero.jpg",
+  "categoriaId": 1
 }
 
-POST http://localhost:8080/productos
-{
-    "nombre": "Ensalada César",
-    "precio": 6.25
-}
+Soft-delete producto
+DELETE http://localhost:8080/productos/{id}
 
-Verificar: GET http://localhost:8080/productos
+Listar todos los productos (admin) -> Debe devolver todos, activas e inactivas.
+GET http://localhost:8080/productos/admin
 
+Restaurar producto
+PUT http://localhost:8080/productos/{id}/restaurar
 
+Filtrar productos:
+GET http://localhost:8080/productos/filtrar
 
----------------------------------------------------------------------------
+Puedes usar cualquiera de estos parámetros (combinados o separados):
+| Parámetro     | Tipo      | Ejemplo                    |
+| ------------- | --------- | -------------------------- |
+| `categoriaId` | `Long`    | `/filtrar?categoriaId=1`   |
+| `disponible`  | `Boolean` | `/filtrar?disponible=true` |
+| `conStock`    | `Boolean` | `/filtrar?conStock=true`   |
 
-3. CREAR PEDIDOS (Relación Usuario → Pedido)
-POST http://localhost:8080/pedidos
-{
-    "fecha": "2024-01-15",
-    "estado": "PENDIENTE",
-    "total": 25.00,
-    "usuarioId": 1
-}
+GET http://localhost:8080/productos/filtrar?categoriaId=1&disponible=true&conStock=true (con todos)
+GET http://localhost:8080/productos/filtrar?categoriaId=1&disponible=true (con dos)
+GET http://localhost:8080/productos/filtrar?categoriaId=1 (con uno)
 
-POST http://localhost:8080/pedidos
-{
-    "fecha": "2024-01-15", 
-    "estado": "CONFIRMADO",
-    "total": 15.00,
-    "usuarioId": 1
-}
-
-Verificar relaciones:
-- GET http://localhost:8080/pedidos/usuario/1 (debe mostrar 2 pedidos del usuario 1)
-- GET http://localhost:8080/pedidos/1 (verificar que trae datos del usuario)
-
----------------------------------------------------------------------------
-
-4. CREAR DETALLES DE PEDIDO (Relaciones Pedido → DetallePedido ← Producto)
-POST http://localhost:8080/detalles-pedido
-{
-    "cantidad": 2,
-    "subtotal": 25.00,
-    "pedidoId": 1,
-    "productoId": 1
-}
-
-POST http://localhost:8080/detalles-pedido
-{
-    "cantidad": 1,
-    "subtotal": 8.75,
-    "pedidoId": 1,
-    "productoId": 2
-}
-
-POST http://localhost:8080/detalles-pedido
-{
-    "cantidad": 1,
-    "subtotal": 6.25,
-    "pedidoId": 2,
-    "productoId": 3
-}
-
-Verificar relaciones:
-- GET http://localhost:8080/detalles-pedido/pedido/1 (debe mostrar 2 detalles del pedido 1)
-- GET http://localhost:8080/detalles-pedido/1 (verificar que trae datos del pedido y producto)
-
----------------------------------------------------------------------------
-
-5. TEST DE ESTADOS (Enum Estado)
-PUT http://localhost:8080/pedidos/1
-{
-    "estado": "CONFIRMADO",
-    "total": 25.00
-}
-
-PUT http://localhost:8080/pedidos/2
-{
-    "estado": "TERMINADO", 
-    "total": 15.00
-}
-
-Verificar estados:
-- GET http://localhost:8080/pedidos/estado/CONFIRMADO
-- GET http://localhost:8080/pedidos/estado/TERMINADO
-
----------------------------------------------------------------------------
-
-6. TEST DE ROLES (Enum Rol)
-GET http://localhost:8080/usuarios/1 (debe ser USUARIO)
-GET http://localhost:8080/usuarios/2 (debe ser ADMIN)
-
----------------------------------------------------------------------------
-
-7. TEST DE BÚSQUEDAS ESPECÍFICAS
-- GET http://localhost:8080/usuarios/email/maria@email.com
-- GET http://localhost:8080/productos/buscar/pizza
-
----------------------------------------------------------------------------
-
-8. TEST DE SOFT DELETE
-DELETE http://localhost:8080/productos/3
-
-Verificar:
-- GET http://localhost:8080/productos (no debe mostrar el producto 3)
-- GET http://localhost:8080/detalles-pedido/3 (debe seguir funcionando aunque el producto esté "eliminado")
-
----------------------------------------------------------------------------
-
-9. TEST DE ACTUALIZACIONES
-PUT http://localhost:8080/usuarios/1
-{
-    "nombre": "María Elena",
-    "apellido": "Gonzalez",
-    "password": "nueva123"
-}
-
-PUT http://localhost:8080/detalles-pedido/1
-{
-    "cantidad": 3,
-    "subtotal": 37.50
-}
-
----------------------------------------------------------------------------
-
-VERIFICACIONES FINALES DEL UML:
-
-1. Usuario → Pedido ✅ (Un usuario tiene múltiples pedidos)
-2. Pedido → DetallePedido ✅ (Un pedido tiene múltiples detalles)  
-3. Producto → DetallePedido ✅ (Un producto está en múltiples detalles)
-4. Enums funcionando ✅ (Rol: USUARIO/ADMIN, Estado: PENDIENTE/CONFIRMADO/CANCELADO/TERMINADO)
-5. Relaciones unidireccionales ✅ (Como se especifica en el PDF)
-6. SHA-256 para contraseñas ✅ (Se hashean automáticamente)
-7. Soft Delete ✅ (eliminado = true)
-
-ESTADO ESPERADO FINAL:
-- 2 usuarios (1 USUARIO, 1 ADMIN)
-- 3 productos (1 "eliminado")
-- 2 pedidos (diferentes estados)
-- 3 detalles de pedido (relacionando todo)
+LLegados a este punto, podemos borrar la categoria creada con el producto adjuntado creado, y veremos que se borrará
+la categoría junto con todos los productos que hay en la categoria.
