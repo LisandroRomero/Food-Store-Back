@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class DetallePedidoMapper {
 
     @Autowired
-    private ProductoMapper productoMapper;
+    private static ProductoMapper productoMapper;
 
     public DetallePedidoResponseDTO toResponseDTO(DetallePedido detallePedido) {
         if (detallePedido == null) {

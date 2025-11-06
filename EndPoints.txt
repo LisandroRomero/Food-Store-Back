@@ -1,7 +1,7 @@
 Categorías:
 
 Crear categoría:
-POST http://localhost:8080/categorias
+POST http://localhost:8080/api/categorias
 {
   "nombre": "Bebidas",
   "descripcion": "Todo tipo de bebidas",
@@ -9,7 +9,7 @@ POST http://localhost:8080/categorias
 }
 
 Leer todas las categorías activas
-GET http://localhost:8080/categorias
+GET http://localhost:8080/api/categorias
 
 Listar todas las categorías (admin) -> Debe devolver todas, activas e inactivas.
 GET http://localhost:8080/categorias/admin
@@ -37,7 +37,7 @@ PUT http://localhost:8080/categorias/{id}/restaurar
 Productos:
 
 Crear producto:
-POST http://localhost:8080/productos
+POST http://localhost:8080/api/productos
 {
   "nombre": "Coca Cola",
   "descripcion": "Refresco de cola",
@@ -49,7 +49,7 @@ POST http://localhost:8080/productos
 }
 
 Leer todos los productos activos:
-GET http://localhost:8080/productos
+GET http://localhost:8080/api/productos
 
 Listar todos los productos (admin) -> Debe devolver todos, activas e inactivas.
 GET http://localhost:8080/productos/admin

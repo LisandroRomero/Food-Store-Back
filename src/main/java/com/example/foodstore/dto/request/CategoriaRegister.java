@@ -21,4 +21,7 @@ public class CategoriaRegister {
 
     @Size(max = 300, message = "La URL de la imagen no puede superar los 300 caracteres")
     private String imagen;
+
+    // ID de la categoría padre (opcional)
+    private Long categoriaPadreId;
 }

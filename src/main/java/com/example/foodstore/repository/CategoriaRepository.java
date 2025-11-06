@@ -41,4 +41,20 @@ public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
     @Query("SELECT DISTINCT c FROM Categoria c " +
            "JOIN c.productos p WHERE p.disponible = true")
     List<Categoria> findCategoriasConProductosDisponibles();
+
+    // Buscar categorías raíz (sin padre)
+    List<Categoria> findByCategoriaPadreIsNull();
+
+    // Buscar categorías raíz activas
+    List<Categoria> findByCategoriaPadreIsNullAndActivoTrue();
+
+    // Buscar subcategorías por padre
+    List<Categoria> findByCategoriaPadreId(Long categoriaPadreId);
+
+    // Buscar subcategorías activas por padre
+    List<Categoria> findByCategoriaPadreIdAndActivoTrue(Long categoriaPadreId);
+
+    // Buscar categorías por nivel (opcional, para futuras expansiones)
+    @Query("SELECT c FROM Categoria c WHERE c.categoriaPadre IS NULL AND c.activo = true")
+    List<Categoria> findCategoriasRaizActivas();
 }
