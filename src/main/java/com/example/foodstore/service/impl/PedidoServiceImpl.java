@@ -122,14 +122,63 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     public PedidoResponseDTO actualizar(Long id, PedidoEdit pedidoEdit) {
-        Optional<Pedido> pedidoOptional = pedidoRepository.findById(id);
-        if (pedidoOptional.isPresent()) {
-            Pedido pedido = pedidoOptional.get();
-            PedidoMapper.updateEntityFromEdit(pedido, pedidoEdit);
-            pedido = pedidoRepository.save(pedido);
-            return PedidoMapper.toDTO(pedido);
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pedido no encontrado con ID: " + id));
+
+        Estado estadoAnterior = pedido.getEstado();
+        Estado nuevoEstado = Estado.valueOf(pedidoEdit.getEstado());
+
+        // Validar transición de estado
+        if (!esTransicionValida(estadoAnterior, nuevoEstado)) {
+            throw new RuntimeException(
+                    "Transición de estado inválida: " + estadoAnterior + " → " + nuevoEstado +
+                            ". Estados finales (TERMINADO, CANCELADO) no pueden modificarse."
+            );
         }
-        return null;
+
+        // Si el estado cambió a CANCELADO, restaurar stock
+        if (estadoAnterior != Estado.CANCELADO && nuevoEstado == Estado.CANCELADO) {
+            restaurarStock(pedido);
+        }
+
+        // Solo actualizar el estado
+        pedido.setEstado(nuevoEstado);
+
+        Pedido pedidoActualizado = pedidoRepository.save(pedido);
+        return PedidoMapper.toDTO(pedidoActualizado);
+    }
+
+    /**
+     * Valida las transiciones permitidas entre estados
+     */
+    private boolean esTransicionValida(Estado estadoActual, Estado nuevoEstado) {
+        // Estados finales no pueden cambiar
+        if (estadoActual == Estado.TERMINADO || estadoActual == Estado.CANCELADO) {
+            return false;
+        }
+
+        // Validar transiciones específicas
+        switch (estadoActual) {
+            case PENDIENTE:
+                return nuevoEstado == Estado.CONFIRMADO || nuevoEstado == Estado.CANCELADO;
+            case CONFIRMADO:
+                return nuevoEstado == Estado.TERMINADO || nuevoEstado == Estado.CANCELADO;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Metodo auxiliar para restaurar stock cuando se cancela un pedido
+     */
+    private void restaurarStock(Pedido pedido) {
+        if (pedido.getDetalles() != null) {
+            for (DetallePedido detalle : pedido.getDetalles()) {
+                Producto producto = detalle.getProducto();
+                producto.setStock(producto.getStock() + detalle.getCantidad());
+                productoRepository.save(producto);
+            }
+        }
     }
 
     @Override
