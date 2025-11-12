@@ -88,7 +88,7 @@ public class DataLoader implements CommandLineRunner {
                     return categoriaRepository.save(Categoria.builder()
                             .nombre("Platos Principales")
                             .descripcion("Platos principales para almuerzo o cena")
-                            .imagen("https://depositphotos.com/es/illustrations/men%C3%BA-comida-rapida.html")
+                            .imagen("https://www.marthadebayle.com/wp-content/uploads/2024/05/comida-chatarra-y-como-evitarla.jpg")
                             .activo(true)
                             .build());
                 });
@@ -100,27 +100,27 @@ public class DataLoader implements CommandLineRunner {
                     return categoriaRepository.save(Categoria.builder()
                             .nombre("Gaseosas")
                             .descripcion("Bebidas carbonatadas y refrescos")
-                            .imagen("https://www.istockphoto.com/es/fotos/botellas-de-bebidas-gaseosas")
+                            .imagen("https://i.pinimg.com/736x/17/53/07/17530782da06b17d1e6654526dbde2be.jpg")
                             .categoriaPadre(bebidas)  // ← RELACIÓN CON PADRE
                             .activo(true)
                             .build());
                 });
 
         // PRODUCTOS EN BEBIDAS (directamente)
-        crearProductoSiNoExiste("Agua Mineral", "Agua purificada sin gas", 80.0, 100, "https://www.supermaxi.com/producto/agua-mineral-natural-sin-gas-tesalia-1200ml-2/", bebidas);
-        crearProductoSiNoExiste("Jugo de Naranja", "Jugo natural de naranja", 120.0, 50, "https://www.istockphoto.com/es/fotos/zumo-de-naranja", bebidas);
+        crearProductoSiNoExiste("Agua Mineral", "Agua purificada sin gas", 80.0, 100, "https://www.supermaxi.com/wp-content/uploads/2024/12/759494997838-1-5.jpg", bebidas);
+        crearProductoSiNoExiste("Jugo de Naranja", "Jugo natural de naranja", 120.0, 50, "https://libbys.es/wordpress/wp-content/uploads/2019/09/mitos-zumo-de-naranja.jpg", bebidas);
 
         // PRODUCTOS EN GASEOSAS (subcategoría)
-        crearProductoSiNoExiste("Coca Cola", "Refresco de cola", 150.0, 80, "https://www.istockphoto.com/es/fotos/lata-de-coca", gaseosas);
-        crearProductoSiNoExiste("Sprite", "Refresco de lima-limón", 140.0, 60, "https://www.istockphoto.com/es/foto/sprite-lata-de-aluminio-gm458304573-22587611", gaseosas);
-        crearProductoSiNoExiste("Fanta", "Refresco de naranja", 140.0, 70, "https://www.istockphoto.com/es/fotos/fanta-fotos", gaseosas);
+        crearProductoSiNoExiste("Coca Cola", "Refresco de cola", 150.0, 80, "https://upload.wikimedia.org/wikipedia/commons/2/27/Coca_Cola_Flasche_-_Original_Taste.jpg", gaseosas);
+        crearProductoSiNoExiste("Sprite", "Refresco de lima-limón", 140.0, 60, "https://chamberswineandliquor.com/wp-content/uploads/2021/12/4913207.jpg", gaseosas);
+        crearProductoSiNoExiste("Fanta", "Refresco de naranja", 140.0, 70, "https://www.coca-cola.com/content/dam/onexp/es/es/brand/fanta-v2/es_fanta_naranja_750x750.jpg", gaseosas);
 
         // PRODUCTOS EN SNACKS
-        crearProductoSiNoExiste("Papas Fritas", "Papas fritas crujientes", 200.0, 40, "https://www.istockphoto.com/es/fotos/papas-fritas-en-paquete-sin-marcar", platos);
-        crearProductoSiNoExiste("Nachos", "Tortilla chips para dipping", 180.0, 30, "https://www.istockphoto.com/es/fotos/nachos", platos);
-        crearProductoSiNoExiste("Hamburguesa", "Hamburguesa completa con aderezos", 250.0, 100, "https://www.istockphoto.com/es/fotos/hamburguesa", platos);
-        crearProductoSiNoExiste("Lomo pan arabe", "Sandwitch de Lomo", 120.0, 60, "https://www.infobae.com/tendencias/2024/03/10/un-clasico-sandwich-argentino-esta-entre-los-mejores-10-del-mundo-segun-taste-atlas/", platos);
-        crearProductoSiNoExiste("Pancho", "Pancho completo con aderezos", 110.0, 80, "https://www.istockphoto.com/es/fotos/panchos", platos);
+        crearProductoSiNoExiste("Papas Fritas", "Papas fritas crujientes", 200.0, 40, "https://micorazondearroz.com/wp-content/uploads/2020/09/DSC02914-scaled.jpg", platos);
+        crearProductoSiNoExiste("Nachos", "Tortilla chips para dipping", 180.0, 30, "https://www.tasteofhome.com/wp-content/uploads/2018/04/Zucchini-Pico-de-Gallo-Salsa_EXPS_THSUM18_199216_D02_01_9b.jpg", platos);
+        crearProductoSiNoExiste("Hamburguesa", "Hamburguesa", 250.0, 100, "https://imag.bonviveur.com/hamburguesa-clasica.jpg", platos);
+        crearProductoSiNoExiste("Lomo pan arabe", "Sandwitch de Lomo", 120.0, 60, "https://www.clarin.com/images/2021/07/26/u-aUfp64d_1200x630__1.jpg", platos);
+        crearProductoSiNoExiste("Pancho", "Pancho completo", 110.0, 80, "https://cloudfront-us-east-1.images.arcpublishing.com/grupoclarin/ELL3XQJDNBFNJI7YN5ZLXQQL6U.jpg", platos);
 
         log.info("Categorías y productos de prueba creados/verificados");
     }
