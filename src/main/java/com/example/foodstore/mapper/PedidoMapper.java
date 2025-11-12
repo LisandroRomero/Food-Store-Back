@@ -98,6 +98,5 @@ public class PedidoMapper {
         if (pedidoEdit.getEstado() != null) {
             pedido.setEstado(Estado.valueOf(pedidoEdit.getEstado()));
         }
-        pedido.setTotal(pedidoEdit.getTotal());
     }
 }
