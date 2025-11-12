@@ -1,6 +1,7 @@
 package com.example.foodstore.dto.response;
 
 import lombok.*;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,5 +14,14 @@ public class CategoriaResponseDTO {
     private String descripcion;
     private String imagen;
     private int totalProductos;
-    private boolean activo;// Cantidad de productos en esta categoría
+    private boolean activo;
+
+    // Información de la categoría padre
+    private CategoriaSimpleDTO categoriaPadre;
+
+    // Lista de subcategorías
+    private List<CategoriaSimpleDTO> subcategorias;
+
+    // Contador de subcategorías
+    private int totalSubcategorias;
 }

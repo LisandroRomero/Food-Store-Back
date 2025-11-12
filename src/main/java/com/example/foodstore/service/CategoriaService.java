@@ -39,4 +39,24 @@ public interface CategoriaService {
     void eliminar(Long id);
 
     void restaurar(Long id);
+
+    /**
+     * Buscar categorías raíz (sin padre)
+     */
+    List<CategoriaResponseDTO> buscarCategoriasRaiz();
+
+    /**
+     * Buscar árbol completo de categorías
+     */
+    List<CategoriaResponseDTO> buscarArbolCategorias();
+
+    /**
+     * Buscar subcategorías por categoría padre
+     */
+    List<CategoriaResponseDTO> buscarSubcategorias(Long categoriaPadreId);
+
+    /**
+     * Mover categoría a otro padre
+     */
+    CategoriaResponseDTO moverCategoria(Long categoriaId, Long nuevoPadreId);
 }

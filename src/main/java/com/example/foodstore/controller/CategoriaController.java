@@ -206,4 +206,109 @@ public class CategoriaController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Buscar categorías raíz (sin padre)
+     */
+    @GetMapping("/raiz")
+    public ResponseEntity<?> buscarCategoriasRaiz() {
+        log.debug("GET /api/categorias/raiz - Buscando categorías raíz");
+        try {
+            List<CategoriaResponseDTO> categorias = categoriaService.buscarCategoriasRaiz();
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(categorias);
+
+        } catch (Exception e) {
+            log.error("Error interno del servidor: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("message", "Error interno del servidor"));
+        }
+    }
+
+    /**
+     * Buscar árbol completo de categorías
+     */
+    @GetMapping("/arbol")
+    public ResponseEntity<?> buscarArbolCategorias() {
+        log.debug("GET /api/categorias/arbol - Buscando árbol de categorías");
+        try {
+            List<CategoriaResponseDTO> categorias = categoriaService.buscarArbolCategorias();
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(categorias);
+
+        } catch (Exception e) {
+            log.error("Error interno del servidor: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("message", "Error interno del servidor"));
+        }
+    }
+
+    /**
+     * Buscar subcategorías por categoría padre
+     */
+    @GetMapping("/{categoriaPadreId}/subcategorias")
+    public ResponseEntity<?> buscarSubcategorias(@PathVariable Long categoriaPadreId) {
+        log.debug("GET /api/categorias/{}/subcategorias - Buscando subcategorías", categoriaPadreId);
+        try {
+            List<CategoriaResponseDTO> subcategorias = categoriaService.buscarSubcategorias(categoriaPadreId);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(subcategorias);
+
+        } catch (ResourceNotFoundException e) {
+            log.error("Recurso no encontrado: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("message", e.getMessage()));
+
+        } catch (Exception e) {
+            log.error("Error interno del servidor: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("message", "Error interno del servidor"));
+        }
+    }
+
+    /**
+     * Mover categoría a otro padre
+     */
+    @PatchMapping("/{categoriaId}/mover")
+    public ResponseEntity<?> moverCategoria(
+            @PathVariable Long categoriaId,
+            @RequestBody Map<String, Long> request) {
+
+        log.debug("PATCH /api/categorias/{}/mover - Moviendo categoría", categoriaId);
+        try {
+            Long nuevoPadreId = request.get("nuevoPadreId"); // Puede ser null para hacerla raíz
+
+            CategoriaResponseDTO categoria = categoriaService.moverCategoria(categoriaId, nuevoPadreId);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of(
+                            "message", "Categoría movida exitosamente",
+                            "data", categoria
+                    ));
+
+        } catch (ResourceNotFoundException e) {
+            log.error("Recurso no encontrado: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("message", e.getMessage()));
+
+        } catch (IllegalArgumentException e) {
+            log.error("Error de validación: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("message", e.getMessage()));
+
+        } catch (Exception e) {
+            log.error("Error interno del servidor: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("message", "Error interno del servidor"));
+        }
+    }
 }

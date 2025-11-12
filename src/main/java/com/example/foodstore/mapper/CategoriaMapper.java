@@ -7,6 +7,8 @@ import com.example.foodstore.dto.response.CategoriaSimpleDTO;
 import com.example.foodstore.entity.Categoria;
 import org.springframework.stereotype.Component;
 
+import java.util.stream.Collectors;
+
 @Component
 public class CategoriaMapper {
 
@@ -22,6 +24,7 @@ public class CategoriaMapper {
                 .nombre(categoriaRegister.getNombre())
                 .descripcion(categoriaRegister.getDescripcion())
                 .imagen(categoriaRegister.getImagen())
+                // La categoriaPadre se setea en el servicio
                 .build();
     }
 
@@ -40,6 +43,17 @@ public class CategoriaMapper {
                 .imagen(categoria.getImagen())
                 .totalProductos(categoria.getProductos() != null ? categoria.getProductos().size() : 0)
                 .activo(categoria.isActivo())
+                // Mapear categoría padre
+                .categoriaPadre(categoria.getCategoriaPadre() != null ?
+                        toSimpleDTO(categoria.getCategoriaPadre()) : null)
+                // Mapear subcategorías
+                .subcategorias(categoria.getSubcategorias() != null ?
+                        categoria.getSubcategorias().stream()
+                                .map(this::toSimpleDTO)
+                                .collect(Collectors.toList()) : null)
+                // Contador de subcategorías
+                .totalSubcategorias(categoria.getSubcategorias() != null ?
+                        categoria.getSubcategorias().size() : 0)
                 .build();
     }
 

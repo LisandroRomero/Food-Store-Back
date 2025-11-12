@@ -38,8 +38,17 @@ public class CategoriaServiceImpl implements CategoriaService {
             throw new DuplicateResourceException("Ya existe una categoría con el nombre: " + categoriaRegister.getNombre());
         }
 
+        // Buscar categoría padre si se especificó
+        Categoria categoriaPadre = null;
+        if (categoriaRegister.getCategoriaPadreId() != null) {
+            categoriaPadre = categoriaRepository.findById(categoriaRegister.getCategoriaPadreId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Categoría padre no encontrada con ID: " + categoriaRegister.getCategoriaPadreId()));
+        }
+
         // Convertir DTO a entidad y guardar
         Categoria categoria = categoriaMapper.toEntity(categoriaRegister);
+        categoria.setCategoriaPadre(categoriaPadre);
         Categoria categoriaGuardada = categoriaRepository.save(categoria);
 
         log.info("Categoría creada exitosamente con ID: {}", categoriaGuardada.getId());
@@ -103,6 +112,90 @@ public class CategoriaServiceImpl implements CategoriaService {
 
         log.info("Categoría actualizada exitosamente con ID: {}", id);
         return categoriaMapper.toResponseDTO(categoriaActualizada);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoriaResponseDTO> buscarCategoriasRaiz() {
+        log.debug("Buscando categorías raíz");
+
+        List<Categoria> categoriasRaiz = categoriaRepository.findByCategoriaPadreIsNullAndActivoTrue();
+        return categoriasRaiz.stream()
+                .map(categoriaMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoriaResponseDTO> buscarArbolCategorias() {
+        log.debug("Buscando árbol completo de categorías");
+
+        List<Categoria> categoriasRaiz = categoriaRepository.findByCategoriaPadreIsNullAndActivoTrue();
+        return categoriasRaiz.stream()
+                .map(categoriaMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoriaResponseDTO> buscarSubcategorias(Long categoriaPadreId) {
+        log.debug("Buscando subcategorías para padre ID: {}", categoriaPadreId);
+
+        // Verificar que la categoría padre existe
+        if (!categoriaRepository.existsById(categoriaPadreId)) {
+            throw new ResourceNotFoundException("Categoría padre no encontrada con ID: " + categoriaPadreId);
+        }
+
+        List<Categoria> subcategorias = categoriaRepository.findByCategoriaPadreIdAndActivoTrue(categoriaPadreId);
+        return subcategorias.stream()
+                .map(categoriaMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CategoriaResponseDTO moverCategoria(Long categoriaId, Long nuevoPadreId) {
+        log.debug("Moviendo categoría ID: {} a nuevo padre ID: {}", categoriaId, nuevoPadreId);
+
+        // Buscar categoría a mover
+        Categoria categoria = categoriaRepository.findById(categoriaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada con ID: " + categoriaId));
+
+        // Buscar nuevo padre (si se especificó)
+        Categoria nuevoPadre = null;
+        if (nuevoPadreId != null) {
+            nuevoPadre = categoriaRepository.findById(nuevoPadreId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Categoría padre no encontrada con ID: " + nuevoPadreId));
+
+            // Validar que no se cree ciclo (una categoría no puede ser padre de sí misma)
+            if (categoriaId.equals(nuevoPadreId)) {
+                throw new IllegalArgumentException("Una categoría no puede ser padre de sí misma");
+            }
+
+            // Validar ciclos en el árbol
+            if (tieneCiclo(categoria, nuevoPadre)) {
+                throw new IllegalArgumentException("No se puede mover la categoría porque crearía un ciclo en el árbol");
+            }
+        }
+
+        categoria.setCategoriaPadre(nuevoPadre);
+        Categoria categoriaActualizada = categoriaRepository.save(categoria);
+
+        log.info("Categoría movida exitosamente");
+        return categoriaMapper.toResponseDTO(categoriaActualizada);
+    }
+
+    /**
+     * Metodo auxiliar para detectar ciclos en el árbol
+     */
+    private boolean tieneCiclo(Categoria categoria, Categoria posiblePadre) {
+        Categoria actual = posiblePadre;
+        while (actual != null) {
+            if (actual.getId().equals(categoria.getId())) {
+                return true; // Se encontró ciclo
+            }
+            actual = actual.getCategoriaPadre();
+        }
+        return false;
     }
 
     @Override
